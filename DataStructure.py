@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, deque
 
 class DS:
     class Node:
@@ -88,13 +88,11 @@ class DS:
             elif value > root.data:
                 root.right = self.delete(root.right, value)
             else:
-                # Node with only one child or no child
                 if root.left is None:
                     return root.right
                 elif root.right is None:
                     return root.left
-                # Node with two children:
-                # Get inorder successor (smallest in the right subtree)
+        
                 min_val = self.find_min(root.right)
                 root.data = min_val
                 root.right = self.delete(root.right, min_val)
@@ -200,6 +198,8 @@ class DS:
 
     """Graphs"""
     class Graph:
+
+        """Graph using Adjacency List representation"""
         class GraphAdjacencyList:
             def __init__(self, directed=False):
                 self.graph = defaultdict(list)
@@ -233,6 +233,7 @@ class DS:
                     neighbors = [f"{neighbor}({weight})" for neighbor, weight in self.graph[vertex]]
                     print(f"{vertex}: {neighbors}")
 
+        """Graph using Adjacency Matrix representation"""
         class GraphAdjacencyMatrix:
             def __init__(self, num_vertices, directed=False):
                 self.num_vertices = num_vertices
@@ -276,3 +277,58 @@ class DS:
 
             def display(self):
                 pass
+
+        """Graph traversal algorithms: DFS and BFS"""    
+        class GraphTraversal:
+            @staticmethod
+            def dfs_recursive(graph, start, path=None, visited =None):
+                if visited is None:
+                    visited = set()
+                if path is None:
+                    path = []
+                
+                visited.add(start)
+                path.append(start)
+                
+                for neighbor, _ in graph.get_neighbors(start):
+                    if neighbor not in visited:
+                        DS.Graph.GraphTraversal.dfs_recursive(graph, neighbor, visited, path)
+                
+                return path
+
+            @staticmethod
+            def dfs_iterative(graph, start):
+                visited = set()
+                stack = [start]
+                path = []
+                
+                while stack:
+                    vertex = stack.pop()
+                    if vertex not in visited:
+                        visited.add(vertex)
+                        path.append(vertex)
+                        
+                        neighbors = [neighbor for neighbor, _ in graph.get_neighbors(vertex)]
+                        for neighbor in reversed(neighbors):
+                            if neighbor not in visited:
+                                stack.append(neighbor)
+                return path
+            
+            @staticmethod
+            def bfs(graph, start):
+                """Breadth-First Search"""
+                visited = set()
+                queue = deque([start])
+                path = []
+                
+                visited.add(start)
+                
+                while queue:
+                    vertex = queue.popleft()
+                    path.append(vertex)
+                    
+                    for neighbor, _ in graph.get_neighbors(vertex):
+                        if neighbor not in visited:
+                            visited.add(neighbor)
+                            queue.append(neighbor)
+                return path
